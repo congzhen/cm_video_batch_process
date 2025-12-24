@@ -52,3 +52,7 @@ func (a *App) OpenDirectoryDialogSetOutput() {
 func (a *App) Transcode(id, path string, params TranscodeParams) string {
 	return VideoTranscodeProcessor(a.ctx, id, path, params)
 }
+
+func (a *App) OpenTranscodeVideo(path string) {
+	open.Run(path)
+}

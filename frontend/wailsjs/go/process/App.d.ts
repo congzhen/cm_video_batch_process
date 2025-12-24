@@ -10,6 +10,8 @@ export function OpenMultipleVideoFilesDialog():Promise<void>;
 
 export function OpenOutputDirectory():Promise<void>;
 
+export function OpenTranscodeVideo(arg1:string):Promise<void>;
+
 export function OpenWatermarkImageDialog():Promise<void>;
 
 export function Transcode(arg1:string,arg2:string,arg3:process.TranscodeParams):Promise<string>;

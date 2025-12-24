@@ -129,6 +129,12 @@ func VideoTranscodeProcessor(ctx context.Context, id, inputFilePath string, para
 		fmt.Printf("\r处理完成! \n")
 	}
 	wailsRuntime.EventsEmit(ctx, "videoTranscodeProcessor", id, 100, "completed")
+	videoInfo, err := GetVideoInfo(outputFilePath)
+	if err == nil {
+		videoInfo.ID = id
+		wailsRuntime.EventsEmit(ctx, "videoTranscodeSuccess", videoInfo)
+	}
+
 	fmt.Printf("处理视频成功: %s\n", outputFilePath)
 	return "OK"
 }

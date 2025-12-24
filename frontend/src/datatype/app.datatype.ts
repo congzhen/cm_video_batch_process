@@ -24,6 +24,7 @@ export interface videoInfo {
 
 export interface videoInfoHasParams extends videoInfo {
     outputSetParams: null | videoParams,
+    transcodeVideoInfo: null | videoInfo,
     progress: number,
 }
 

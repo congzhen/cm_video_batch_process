@@ -45,6 +45,21 @@
                             <div class="video-tag" v-else>
                                 <el-tag type="primary" effect="light">通用设置</el-tag>
                             </div>
+                            <div class="transcodeVideoSuccess" v-if="scope.row.transcodeVideoInfo">
+                                <div class="video-tag">
+                                    <el-tag type="success">{{ scope.row.transcodeVideoInfo.width + '×' +
+                                        scope.row.transcodeVideoInfo.height }}</el-tag>
+                                    <el-tag type="success">{{ formatFileSize(scope.row.transcodeVideoInfo.size)
+                                    }}</el-tag>
+                                    <el-tag type="success">{{ formatDuration(scope.row.transcodeVideoInfo.duration)
+                                    }}</el-tag>
+                                    <el-tag type="success">{{ scope.row.transcodeVideoInfo.fps }} fps</el-tag>
+                                    <el-tag type="success">{{ formatFileSize(scope.row.transcodeVideoInfo.video_bitrate)
+                                    }}</el-tag>
+                                    <el-tag type="success">{{ scope.row.transcodeVideoInfo.video_codec }}</el-tag>
+                                    <el-tag type="success">{{ scope.row.transcodeVideoInfo.audio_codec }}</el-tag>
+                                </div>
+                            </div>
                         </div>
                     </template>
 
@@ -59,6 +74,10 @@
                             <div>
                                 <el-button type="danger" icon="Delete" plain size="small"
                                     @click="deleteVideoHandle(scope.$index)" />
+                            </div>
+                            <div v-if="scope.row.transcodeVideoInfo">
+                                <el-button type="success" icon="VideoPlay" plain size="small"
+                                    @click="playTranscodeVideoHandel(scope.row.transcodeVideoInfo.path)" />
                             </div>
                         </div>
                     </template>
@@ -89,7 +108,7 @@ import { formatFileSize, formatDuration } from '@/assets/dataConversion'
 import setParams from '@/components/setParams/setParams.vue';
 import { onMounted, ref, computed } from 'vue';
 import { EventsOn_filesSelectedMultipleVideoFiles, openVideoDialog, openDirectoryDialogSetOutput, EventsOn_directoryDialogSetOutput } from '@/process/dialog.process'
-import { EventsOn_videoTranscodeProcessor, getAppData, openOutputDirectory, transcode } from '@/process/app.process'
+import { EventsOn_videoTranscodeProcessor, EventsOn_videoTranscodeSuccess, getAppData, openOutputDirectory, openTranscodeVideo, transcode } from '@/process/app.process'
 import setParamsDialog from '@/components/setParams/setParamsDialog.vue';
 import { ElMessage } from 'element-plus';
 
@@ -155,7 +174,9 @@ const setParamsDialogHandle = (videoInfoHasParams: videoInfoHasParams) => {
 const deleteVideoHandle = (index: number) => {
     videoList.value.splice(index, 1)
 }
-
+const playTranscodeVideoHandel = async (path: string) => {
+    await openTranscodeVideo(path)
+}
 
 
 const startHandle = async () => {
@@ -195,6 +216,7 @@ onMounted(async () => {
             return {
                 ...videoInfo,
                 outputSetParams: null,
+                transcodeVideoInfo: null,
                 progress: 0
             }
         }))
@@ -213,6 +235,14 @@ onMounted(async () => {
                 } else {
                     videoList.value[i].progress = parseFloat(progress.toFixed(2))
                 }
+                break
+            }
+        }
+    })
+    EventsOn_videoTranscodeSuccess((transcodeVideoInfo: videoInfo) => {
+        for (let i = 0; i < videoList.value.length; i++) {
+            if (videoList.value[i].id == transcodeVideoInfo.id) {
+                videoList.value[i].transcodeVideoInfo = transcodeVideoInfo
                 break
             }
         }
@@ -253,6 +283,13 @@ onMounted(async () => {
             height: 80px;
         }
 
+
+        .video-tag {
+            display: flex;
+            flex-wrap: wrap;
+            gap: 2px;
+        }
+
         .input-video-info {
             width: 100%;
             height: 100%;
@@ -264,11 +301,6 @@ onMounted(async () => {
                 font-weight: 700;
             }
 
-            .video-tag {
-                display: flex;
-                flex-wrap: wrap;
-                gap: 2px;
-            }
 
             .video-path {
                 font-size: 11px;
@@ -286,13 +318,8 @@ onMounted(async () => {
             flex-direction: column;
             gap: 5px;
 
-            .video-progress {}
 
-            .video-tag {
-                display: flex;
-                flex-wrap: wrap;
-                gap: 2px;
-            }
+
 
         }
     }
