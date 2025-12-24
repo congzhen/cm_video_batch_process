@@ -5,6 +5,7 @@ import (
 	"context"
 	"fmt"
 	"os/exec"
+	"path"
 	"regexp"
 	"strconv"
 	"strings"
@@ -39,6 +40,7 @@ type TranscodeParams struct {
 	Fps                string             `json:"fps"`
 	VideoBitrate       string             `json:"video_bitrate"`
 	WatermarkContent   string             `json:"watermark_content"`
+	WatermarkImage     string             `json:"watermark_image"`
 	WatermarkPlacement WatermarkPlacement `json:"watermark_placement"`
 	Rotate             VideoRotate        `json:"rotate"`
 	UseGpu             bool               `json:"use_gpu"`
@@ -161,9 +163,14 @@ func buildTranscodeCommand(inputFilePath string, outputFilePath string, params T
 	}
 
 	// 如果有水印，则添加水印滤镜
-	if params.WatermarkContent != "" {
-		drawTextFilter := getWatermarkPlacement(params.WatermarkContent, params.WatermarkPlacement)
-		videoFilters = append(videoFilters, drawTextFilter)
+	if params.WatermarkContent != "" || params.WatermarkImage != "" {
+		if params.WatermarkImage != "" {
+			drawImageFilter := getWatermarkPlacementImage(params.WatermarkImage, params.WatermarkPlacement)
+			videoFilters = append(videoFilters, drawImageFilter)
+		} else {
+			drawTextFilter := getWatermarkPlacementText(params.WatermarkContent, params.WatermarkPlacement)
+			videoFilters = append(videoFilters, drawTextFilter)
+		}
 	}
 
 	// 旋转
@@ -233,7 +240,7 @@ func getVideoCodecFormat(params TranscodeParams) string {
 		}
 	default:
 		// 如果要加水印，不能使用copy
-		if params.WatermarkContent != "" {
+		if params.WatermarkContent != "" || params.WatermarkImage != "" {
 			// 默认使用libx264进行重新编码
 			if params.UseGpu {
 				return "h264_nvenc"
@@ -307,8 +314,8 @@ func timeToSeconds(timeStr string) float64 {
 	return hours*3600 + minutes*60 + seconds
 }
 
-// 获取水印位置
-func getWatermarkPlacement(text string, placement WatermarkPlacement) string {
+// 文字水印
+func getWatermarkPlacementText(text string, placement WatermarkPlacement) string {
 	var filter string
 	fontFile := "msyh.ttc"
 	// 使用 text 参数，同时对中文字符进行特殊处理
@@ -342,6 +349,34 @@ func getWatermarkPlacement(text string, placement WatermarkPlacement) string {
 		filter = fmt.Sprintf(
 			"drawtext=fontfile=%s:text='%s':fontcolor=white:fontsize=24:x=w-tw-20:y=20:borderw=2:bordercolor=black",
 			fontFile, escapedText)
+	}
+	return filter
+}
+
+// 图片水印
+func getWatermarkPlacementImage(imagePath string, placement WatermarkPlacement) string {
+	normalizedPath := strings.ReplaceAll(strings.ReplaceAll(path.Clean(imagePath), "\\", "/"), ":", "\\:")
+	quotedPath := fmt.Sprintf("'%s'", normalizedPath)
+	var filter string
+	switch placement {
+	case WatermarkPlacement_Random:
+		// 随机出现位置（在屏幕四个角之间切换）
+		filter = fmt.Sprintf("movie=%s[wm];[in][wm]overlay=if(lt(sin(t*0.5)\\,0)\\,20\\,main_w-overlay_w-20):if(lt(cos(t*0.3)\\,0)\\,20\\,main_h-overlay_h-20)", quotedPath)
+	case WatermarkPlacement_Horizontal:
+		// 水平摆动
+		filter = fmt.Sprintf("movie=%s[wm];[in][wm]overlay=main_w/2+(main_w/4)*sin(2*PI*t/8)-overlay_w/2:main_h/2-overlay_h/2", quotedPath)
+	case WatermarkPlacement_Diagonal:
+		// 对角线运动
+		filter = fmt.Sprintf("movie=%s[wm];[in][wm]overlay=main_w*t/30-overlay_w:main_h*t/30-overlay_h", quotedPath)
+	case WatermarkPlacement_Bounce:
+		// 随机弹跳效果
+		filter = fmt.Sprintf("movie=%s[wm];[in][wm]overlay=main_w/2+(main_w/3)*sin(2*PI*t/10)-overlay_w/2:main_h/2+(main_h/3)*cos(2*PI*t/7)-overlay_h/2", quotedPath)
+	case WatermarkPlacement_Spiral:
+		// 螺旋运动
+		filter = fmt.Sprintf("movie=%s[wm];[in][wm]overlay=main_w/2+(main_w/4)*(sin(2*PI*t/12)+cos(2*PI*t/6))-overlay_w/2:main_h/2+(main_h/4)*(cos(2*PI*t/12)-sin(2*PI*t/6))-overlay_h/2", quotedPath)
+	default:
+		// 右上角 (默认)
+		filter = fmt.Sprintf("movie=%s[wm];[in][wm]overlay=main_w-overlay_w-20:20", quotedPath)
 	}
 	return filter
 }

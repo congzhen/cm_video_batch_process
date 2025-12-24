@@ -34,6 +34,7 @@ export interface videoParams {
     fps: string;
     video_bitrate: string;
     watermark_content: string;
+    watermark_image: string;
     watermark_placement: string;
     rotate: string;
     use_gpu: boolean;

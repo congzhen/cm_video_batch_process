@@ -80,3 +80,32 @@ func (p P_Dialog) OpenDirectoryDialogSetOutput(ctx context.Context) {
 	// 将选中的目录路径发送到前端
 	runtime.EventsEmit(ctx, "directorySelectedSetOutput", directory)
 }
+func (p P_Dialog) OpenWatermarkImageDialog(ctx context.Context) {
+	file, err := runtime.OpenFileDialog(ctx, runtime.OpenDialogOptions{
+		Title: "选择水印图片",
+		Filters: []runtime.FileFilter{
+			{
+				DisplayName: "图片文件 (*.jpg;*.jpeg;*.png;*.gif;*.bmp;*.webp)",
+				Pattern:     "*.jpg;*.jpeg;*.png;*.gif;*.bmp;*.webp",
+			},
+			{
+				DisplayName: "所有文件 (*.*)",
+				Pattern:     "*.*",
+			},
+		},
+		ShowHiddenFiles: false,
+	})
+	if err != nil {
+		runtime.LogError(ctx, fmt.Sprintf("打开文件对话框失败: %v", err))
+		// 发送错误事件到前端
+		runtime.EventsEmit(ctx, "fileSelectedWatermarkImageError", fmt.Sprintf("打开文件对话框失败: %v", err))
+		return
+	}
+	if file == "" {
+		// 发送取消事件到前端
+		runtime.EventsEmit(ctx, "fileSelectedWatermarkImageCancelled", "用户取消了文件选择")
+		return
+	} else {
+		runtime.EventsEmit(ctx, "fileSelectedWatermarkImageSuccess", file)
+	}
+}

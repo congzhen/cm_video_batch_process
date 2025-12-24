@@ -1,5 +1,5 @@
 import { videoInfo } from "@/datatype/app.datatype";
-import { OpenMultipleVideoFilesDialog, OpenDirectoryDialogSetOutput } from "../../wailsjs/go/process/App";
+import { OpenMultipleVideoFilesDialog, OpenDirectoryDialogSetOutput, OpenWatermarkImageDialog } from "../../wailsjs/go/process/App";
 import { EventsOn } from "../../wailsjs/runtime";
 export const openVideoDialog = async () => {
     return await OpenMultipleVideoFilesDialog();
@@ -29,3 +29,12 @@ export const EventsOn_directoryDialogSetOutput = (callback: (arg0: string) => vo
     });
 }
 
+export const openWatermarkImageDialog = async () => {
+    return await OpenWatermarkImageDialog();
+};
+export const EventsOn_watermarkImageDialog = (callback: (arg0: string) => void) => {
+    // 监听选择事件
+    EventsOn("fileSelectedWatermarkImageSuccess", (watermarkImagePath: string) => {
+        callback(watermarkImagePath)
+    });
+}

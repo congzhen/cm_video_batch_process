@@ -18,6 +18,10 @@ export function OpenOutputDirectory() {
   return window['go']['process']['App']['OpenOutputDirectory']();
 }
 
+export function OpenWatermarkImageDialog() {
+  return window['go']['process']['App']['OpenWatermarkImageDialog']();
+}
+
 export function Transcode(arg1, arg2, arg3) {
   return window['go']['process']['App']['Transcode'](arg1, arg2, arg3);
 }

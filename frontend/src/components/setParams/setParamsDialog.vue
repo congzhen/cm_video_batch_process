@@ -1,5 +1,5 @@
 <template>
-    <dialogCommon ref="dialogCommonRef" :title="title_C" btnSubmitTitle="确定" @submit="submitHandle">
+    <dialogCommon ref="dialogCommonRef" width="860" :title="title_C" btnSubmitTitle="确定" @submit="submitHandle">
         <setParams class="set-params-dialog" ref="setParamsRef" :form-width="props.formWidth"
             :gpu-status="props.gpuStatus" :cpu-threads="props.cpuThreads"></setParams>
     </dialogCommon>
@@ -58,8 +58,4 @@ defineExpose({
 
 
 </script>
-<style scoped lang="scss">
-:deep(.block) {
-    justify-content: center !important;
-}
-</style>
+<style scoped lang="scss"></style>

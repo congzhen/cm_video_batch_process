@@ -15,11 +15,12 @@
                         <selectVideoBitrate v-model="videoParams.video_bitrate" :width="props.formWidth">
                         </selectVideoBitrate>
                     </el-form-item>
+
+                </div>
+                <div class="block">
                     <el-form-item label="视频帧率">
                         <selectFps v-model="videoParams.fps" :width="props.formWidth"></selectFps>
                     </el-form-item>
-                </div>
-                <div class="block">
                     <el-form-item label="视频旋转">
                         <selectRotate v-model="videoParams.rotate" :width="props.formWidth"></selectRotate>
                     </el-form-item>
@@ -27,10 +28,25 @@
                         <selectVideoHeight v-model="videoParams.video_height" :width="props.formWidth">
                         </selectVideoHeight>
                     </el-form-item>
+                </div>
+                <div class="block">
                     <el-form-item label="水印文字">
                         <div :style="{ width: props.formWidth }">
                             <el-input v-model="videoParams.watermark_content" placeholder="水印文字"
                                 width="100%"></el-input>
+                        </div>
+                    </el-form-item>
+                    <el-form-item label="图片水印">
+                        <div :style="{ width: props.formWidth }">
+                            <el-input v-model="videoParams.watermark_image">
+                                <template #append>
+                                    <div class="openWatermarkImageDialog" @click="openWatermarkImageDialogHandle">
+                                        <el-icon>
+                                            <FolderOpened />
+                                        </el-icon>
+                                    </div>
+                                </template>
+                            </el-input>
                         </div>
                     </el-form-item>
                     <el-form-item label="水印位置">
@@ -53,7 +69,7 @@
     </div>
 </template>
 <script setup lang="ts">
-import { ref, watch } from 'vue';
+import { ref, watch, onMounted } from 'vue';
 import selectVideoCodec from '../comForm/selectVideoCodec.vue';
 import selectAudioCodec from '../comForm/selectAudioCodec.vue';
 import selectVideoHeight from '../comForm/selectVideoHeight.vue';
@@ -62,10 +78,11 @@ import selectRotate from '../comForm/selectRotate.vue';
 import selectWatermarkPlacement from '../comForm/selectWatermarkPlacement.vue';
 import selectVideoBitrate from '../comForm/selectVideoBitrate.vue';
 import type { videoParams } from '../../datatype/app.datatype';
+import { EventsOn_watermarkImageDialog, openWatermarkImageDialog } from '../../process/dialog.process';
 const props = defineProps({
     formWidth: {
         type: String,
-        default: '200px',
+        default: '220px',
     },
     gpuStatus: {
         type: Boolean,
@@ -85,6 +102,7 @@ const videoParams = ref<videoParams>({
     fps: 'copy',
     rotate: 'copy',
     watermark_content: '',
+    watermark_image: '',
     watermark_placement: 'top-right',
     use_gpu: false,
     cpu_threads: 0,
@@ -96,6 +114,10 @@ watch(() => videoParams.value.watermark_content, (newVal) => { // 只允许字�
         videoParams.value.watermark_content = filtered;
     }
 });
+
+const openWatermarkImageDialogHandle = async () => {
+    await openWatermarkImageDialog();
+}
 
 const getVideoParams = () => {
     return videoParams.value;
@@ -112,11 +134,19 @@ const reset = () => {
         fps: 'copy',
         rotate: 'copy',
         watermark_content: '',
+        watermark_image: '',
         watermark_placement: 'top-right',
         use_gpu: false,
         cpu_threads: 0,
     }
 }
+
+onMounted(() => {
+    EventsOn_watermarkImageDialog((filePath: string) => {
+        videoParams.value.watermark_image = filePath;
+    })
+});
+
 defineExpose({
     getVideoParams,
     setVideoParams,
@@ -133,7 +163,6 @@ defineExpose({
 
         .block {
             display: flex;
-            justify-content: flex-end;
             flex-wrap: wrap;
             gap: 10px;
             align-items: center;
@@ -143,6 +172,16 @@ defineExpose({
 
     :deep(.el-form-item) {
         margin-bottom: 5px;
+    }
+
+
+    :deep(.el-input-group__append) {
+        padding: 0;
+
+        .openWatermarkImageDialog {
+            padding: 0 10px;
+            cursor: pointer;
+        }
     }
 }
 </style>

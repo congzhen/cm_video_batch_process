@@ -34,6 +34,10 @@ func (a *App) OpenMultipleVideoFilesDialog() {
 	P_Dialog{}.OpenMultipleVideoFilesDialog(a.ctx)
 }
 
+func (a *App) OpenWatermarkImageDialog() {
+	P_Dialog{}.OpenWatermarkImageDialog(a.ctx)
+}
+
 func (a *App) OpenOutputDirectory() {
 	outputDirectory := GetOutputDirectory()
 	if !FileExists(outputDirectory) {

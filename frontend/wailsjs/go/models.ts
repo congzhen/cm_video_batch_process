@@ -23,6 +23,7 @@ export namespace process {
 	    fps: string;
 	    video_bitrate: string;
 	    watermark_content: string;
+	    watermark_image: string;
 	    watermark_placement: string;
 	    rotate: string;
 	    use_gpu: boolean;
@@ -40,6 +41,7 @@ export namespace process {
 	        this.fps = source["fps"];
 	        this.video_bitrate = source["video_bitrate"];
 	        this.watermark_content = source["watermark_content"];
+	        this.watermark_image = source["watermark_image"];
 	        this.watermark_placement = source["watermark_placement"];
 	        this.rotate = source["rotate"];
 	        this.use_gpu = source["use_gpu"];

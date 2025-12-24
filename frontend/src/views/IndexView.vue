@@ -300,7 +300,6 @@ onMounted(async () => {
     .set-params {
         flex-shrink: 0;
         display: flex;
-        justify-content: flex-end;
     }
 
     .bottom-toolbar {
