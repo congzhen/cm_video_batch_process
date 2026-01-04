@@ -30,9 +30,9 @@ func (a *App) Shutdown(ctx context.Context) {
 	removeDraggedFilesHandle(ctx)
 }
 
-// BeforeClose 在应用关闭前调用，返回true表示允许关闭，false表示取消关闭
+// BeforeClose 在应用关闭前调用，返回true则阻止关闭，返回false则允许关闭
 func (a *App) BeforeClose(ctx context.Context) bool {
-	return true
+	return false // 允许关闭
 }
 
 func (a *App) AppData() AppData {
