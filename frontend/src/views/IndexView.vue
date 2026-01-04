@@ -3,6 +3,7 @@
         <div class="toolbar">
             <el-button type="primary" icon="Plus" plain @click="openVideoDialogHandle">选择视频</el-button>
             <el-button type="danger" icon="Delete" plain @click="clearHandle">清空列表</el-button>
+            <el-button type="info" icon="Refresh" plain @click="resetListHandle">重置列表</el-button>
         </div>
         <div class="video-list">
             <el-table :data="videoList" height="100%" v-loading="loading" empty-text="未选择视频" style="width: 100%">
@@ -50,12 +51,12 @@
                                     <el-tag type="success">{{ scope.row.transcodeVideoInfo.width + '×' +
                                         scope.row.transcodeVideoInfo.height }}</el-tag>
                                     <el-tag type="success">{{ formatFileSize(scope.row.transcodeVideoInfo.size)
-                                    }}</el-tag>
+                                        }}</el-tag>
                                     <el-tag type="success">{{ formatDuration(scope.row.transcodeVideoInfo.duration)
-                                    }}</el-tag>
+                                        }}</el-tag>
                                     <el-tag type="success">{{ scope.row.transcodeVideoInfo.fps }} fps</el-tag>
                                     <el-tag type="success">{{ formatFileSize(scope.row.transcodeVideoInfo.video_bitrate)
-                                    }}</el-tag>
+                                        }}</el-tag>
                                     <el-tag type="success">{{ scope.row.transcodeVideoInfo.video_codec }}</el-tag>
                                     <el-tag type="success">{{ scope.row.transcodeVideoInfo.audio_codec }}</el-tag>
                                 </div>
@@ -64,20 +65,24 @@
                     </template>
 
                 </el-table-column>
-                <el-table-column label="-" width="60">
+                <el-table-column label="-" width="110">
                     <template #default="scope">
-                        <div>
-                            <div>
-                                <el-button type="primary" icon="Setting" plain size="small"
+                        <div class="opt-btn">
+                            <div class="opt-btn-item">
+                                <el-button type="primary" icon="Setting" plain size="small" title="设置参数"
                                     @click="setParamsDialogHandle(scope.row)" />
                             </div>
-                            <div>
-                                <el-button type="danger" icon="Delete" plain size="small"
+                            <div class="opt-btn-item">
+                                <el-button type="danger" icon="Delete" plain size="small" title="删除"
                                     @click="deleteVideoHandle(scope.$index)" />
                             </div>
-                            <div v-if="scope.row.transcodeVideoInfo">
-                                <el-button type="success" icon="VideoPlay" plain size="small"
+                            <div class="opt-btn-item" v-if="scope.row.transcodeVideoInfo">
+                                <el-button type="success" icon="VideoPlay" plain size="small" title="播放"
                                     @click="playTranscodeVideoHandel(scope.row.transcodeVideoInfo.path)" />
+                            </div>
+                            <div class="opt-btn-item" v-if="scope.row.transcodeVideoInfo">
+                                <el-button type="info" icon="Refresh" plain size="small" title="重置"
+                                    @click="resetHandel(scope.row)" />
                             </div>
                         </div>
                     </template>
@@ -164,6 +169,13 @@ const openVideoDialogHandle = async () => {
 const clearHandle = () => {
     videoList.value = []
 }
+const resetListHandle = () => {
+    for (const videoInfoHasParams of videoList.value) {
+        videoInfoHasParams.progress = 0
+        videoInfoHasParams.outputSetParams = null
+        videoInfoHasParams.transcodeVideoInfo = null
+    }
+}
 const setParamsDialogHandle = (videoInfoHasParams: videoInfoHasParams) => {
     setParamsDialogRef.value?.open(videoInfoHasParams.name, videoInfoHasParams.outputSetParams, (params: null | videoParams) => {
         console.log(params)
@@ -178,6 +190,11 @@ const playTranscodeVideoHandel = async (path: string) => {
     await openTranscodeVideo(path)
 }
 
+const resetHandel = (videoInfoHasParams: videoInfoHasParams) => {
+    videoInfoHasParams.progress = 0
+    videoInfoHasParams.outputSetParams = null
+    videoInfoHasParams.transcodeVideoInfo = null
+}
 
 const startHandle = async () => {
     if (setParamsRef.value) {
@@ -317,8 +334,15 @@ onMounted(async () => {
             display: flex;
             flex-direction: column;
             gap: 5px;
+        }
 
-
+        .opt-btn {
+            display: flex;
+            flex-wrap: wrap; // 允许换行
+            width: 100%;
+            height: 100%;
+            gap: 5px;
+            align-content: flex-start; // 顶部对齐
 
 
         }

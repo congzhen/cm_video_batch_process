@@ -1,6 +1,7 @@
 <template>
     <el-select v-model="selectVal" :clearable="props.clearable" :style="{ width: props.width }" placeholder="视频尺寸"
-        @change="changeHandle" @clear="handleClear" :multiple="props.multiple">
+        @change="changeHandle" @clear="handleClear" :multiple="props.multiple" :allow-create="props.allowCreate"
+        :filterable="props.allowCreate" default-first-option>
         <el-option v-for="item, index in dataset.videoHeight" :key="index" :label="item" :value="item"></el-option>
     </el-select>
 </template>
@@ -17,6 +18,10 @@ const props = defineProps({
         default: false
     },
     clearable: {
+        type: Boolean,
+        default: false
+    },
+    allowCreate: {
         type: Boolean,
         default: false
     }

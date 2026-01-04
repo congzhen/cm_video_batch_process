@@ -12,20 +12,22 @@
                         </selectAudioCodec>
                     </el-form-item>
                     <el-form-item label="视频码率">
-                        <selectVideoBitrate v-model="videoParams.video_bitrate" :width="props.formWidth">
+                        <selectVideoBitrate v-model="videoParams.video_bitrate" :width="props.formWidth"
+                            :allowCreate="true">
                         </selectVideoBitrate>
                     </el-form-item>
 
                 </div>
                 <div class="block">
                     <el-form-item label="视频帧率">
-                        <selectFps v-model="videoParams.fps" :width="props.formWidth"></selectFps>
+                        <selectFps v-model="videoParams.fps" :width="props.formWidth" :allowCreate="true"></selectFps>
                     </el-form-item>
                     <el-form-item label="视频旋转">
                         <selectRotate v-model="videoParams.rotate" :width="props.formWidth"></selectRotate>
                     </el-form-item>
                     <el-form-item label="视频尺寸">
-                        <selectVideoHeight v-model="videoParams.video_height" :width="props.formWidth">
+                        <selectVideoHeight v-model="videoParams.video_height" :width="props.formWidth"
+                            :allowCreate="true">
                         </selectVideoHeight>
                     </el-form-item>
                 </div>
