@@ -113,9 +113,10 @@ import { formatFileSize, formatDuration } from '@/assets/dataConversion'
 import setParams from '@/components/setParams/setParams.vue';
 import { onMounted, ref, computed } from 'vue';
 import { EventsOn_filesSelectedMultipleVideoFiles, openVideoDialog, openDirectoryDialogSetOutput, EventsOn_directoryDialogSetOutput } from '@/process/dialog.process'
-import { EventsOn_videoTranscodeProcessor, EventsOn_videoTranscodeSuccess, getAppData, openOutputDirectory, openTranscodeVideo, transcode } from '@/process/app.process'
+import { EventsOn_Loading, EventsOn_videoTranscodeProcessor, EventsOn_videoTranscodeSuccess, getAppData, openOutputDirectory, openTranscodeVideo, transcode } from '@/process/app.process'
 import setParamsDialog from '@/components/setParams/setParamsDialog.vue';
 import { ElMessage } from 'element-plus';
+import { EventsOn_OnFileDrop } from '@/process/dragAndDrop.process'
 
 const loading = ref(false)
 const setParamsDialogRef = ref<InstanceType<typeof setParamsDialog>>();
@@ -225,6 +226,9 @@ const startHandle = async () => {
 
 onMounted(async () => {
     appData.value = await getAppData()
+    EventsOn_Loading((isLoading: boolean) => {
+        loading.value = isLoading;
+    });
     EventsOn_filesSelectedMultipleVideoFiles((videoInfoSlc: videoInfo[]) => {
         console.log(videoInfoSlc);
         videoList.value.push(...videoInfoSlc.filter(video =>
@@ -264,7 +268,8 @@ onMounted(async () => {
             }
         }
     })
-});
+    EventsOn_OnFileDrop();
+})
 </script>
 <style lang="scss" scoped>
 .index-container {

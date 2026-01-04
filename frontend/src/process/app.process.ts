@@ -2,6 +2,12 @@ import { videoInfo, videoParams } from "@/datatype/app.datatype";
 import { AppData, OpenOutputDirectory, Transcode, OpenTranscodeVideo } from "../../wailsjs/go/process/App";
 import { EventsOn } from "../../wailsjs/runtime";
 
+export const EventsOn_Loading = (callback: (isLoading: boolean) => void) => {
+    EventsOn("setLoadingStatus", (isLoading: boolean) => {
+        callback(isLoading);
+    });
+}
+
 export const getAppData = async () => {
     return await AppData();
 };

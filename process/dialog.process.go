@@ -44,17 +44,17 @@ func (p P_Dialog) OpenMultipleVideoFilesDialog(ctx context.Context) {
 
 	// 处理选中的文件
 	if len(files) > 0 {
-		var videoInfo []VideoInfo
+		var videoInfoSlc []VideoInfo
 		for _, file := range files {
 			info, err := GetVideoInfo(file)
 			if err != nil {
 				runtime.LogError(ctx, fmt.Sprintf("获取视频信息失败: %v", err))
 				continue
 			}
-			videoInfo = append(videoInfo, info)
+			videoInfoSlc = append(videoInfoSlc, info)
 		}
 		// 将选中的文件路径发送到前端
-		runtime.EventsEmit(ctx, "filesSelectedMultipleVideoFilesSuccess", videoInfo)
+		runtime.EventsEmit(ctx, "filesSelectedMultipleVideoFilesSuccess", videoInfoSlc)
 	}
 }
 

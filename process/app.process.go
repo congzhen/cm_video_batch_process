@@ -16,9 +16,23 @@ type AppData struct {
 	GPU             bool   `json:"gpu"`
 }
 
+// Startup 应用启动时的初始化逻辑
 func (a *App) Startup(ctx context.Context) {
 	a.ctx = ctx
 	initConf()
+	// 注册拖拽监听事件
+	addDraggedFilesHandle(ctx)
+}
+
+// Shutdown 应用关闭时的清理逻辑
+func (a *App) Shutdown(ctx context.Context) {
+	//移除拖拽监听事件
+	removeDraggedFilesHandle(ctx)
+}
+
+// BeforeClose 在应用关闭前调用，返回true表示允许关闭，false表示取消关闭
+func (a *App) BeforeClose(ctx context.Context) bool {
+	return true
 }
 
 func (a *App) AppData() AppData {

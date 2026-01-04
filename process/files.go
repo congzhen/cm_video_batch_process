@@ -174,3 +174,15 @@ func ReadFile(fullPath string) ([]byte, error) {
 
 	return content, nil
 }
+
+// 检查是否为视频文件
+func IsVideoFile(filename string) bool {
+	videoExtensions := []string{".mp4", ".avi", ".mov", ".mkv", ".wmv", ".flv", ".webm", ".m4v", ".3gp", ".3g2", ".mpg", ".mpeg", ".m2v", ".mpe", ".mpv", ".m2ts", ".ts", ".vob", ".ifo", ".ogv", ".ogg", ".drc", ".gif", ".gifv", ".mng", ".avi", ".mov", ".qt", ".wmv", ".yuv", ".rm", ".rmvb", ".asf", ".amv", ".m3u8"}
+
+	for _, ext := range videoExtensions {
+		if strings.HasSuffix(strings.ToLower(filename), ext) {
+			return true
+		}
+	}
+	return false
+}
